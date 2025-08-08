@@ -10,6 +10,7 @@ import com.prajwal.example.entities.Question;
 import com.prajwal.example.entities.QuestionWrapper;
 import com.prajwal.example.entities.Quiz;
 import com.prajwal.example.entities.Response;
+import com.prajwal.example.exception.ResourceNotFoundException;
 import com.prajwal.example.repos.QuestionRepository;
 import com.prajwal.example.repos.QuizRepository;
 
@@ -38,19 +39,19 @@ public class QuizService {
 
 	    public List<QuestionWrapper> getQuizQuestions(Integer id) {
 	    	
-	    	//getting all questions for quiz
-	        Optional<Quiz> quiz = quizRepository.findById(id);
-	        
-	        
-	       List<Question> questionsFromDB = quiz.get().getQuestions();
-	       
-	        List<QuestionWrapper> questionsForUser = new ArrayList<>();
-	        for(Question q : questionsFromDB){
-	            QuestionWrapper qw = new QuestionWrapper(q.getQuestionID(), q.getQuestionTitle(), q.getOption1(), q.getOption2(), q.getOption3(), q.getOption4());
-	            questionsForUser.add(qw);
-	        }
+	    	 Quiz quiz = quizRepository.findById(id)
+	    		        .orElseThrow(() -> new ResourceNotFoundException("Quiz not found with ID: " + id));
 
-	        return questionsForUser;
+	    		    List<Question> questionsFromDB = quiz.getQuestions();
+	    		    List<QuestionWrapper> questionsForUser = new ArrayList<>();
+
+	    		    for (Question q : questionsFromDB) {
+	    		        QuestionWrapper qw = new QuestionWrapper(q.getQuestionID(), q.getQuestionTitle(),
+	    		                q.getOption1(), q.getOption2(), q.getOption3(), q.getOption4());
+	    		        questionsForUser.add(qw);
+	    		    }
+
+	    		    return questionsForUser;
 
 	    }
 
@@ -58,22 +59,24 @@ public class QuizService {
 
 		
 	    public Integer calculateResult(int id, List<Response> responses) {
-	        Quiz quiz = quizRepository.findById(id).get();
-	        List<Question> questions = quiz.getQuestions();
-	        int rightAnswerScore = 0;
+	    	 Quiz quiz = quizRepository.findById(id)
+	    		        .orElseThrow(() -> new ResourceNotFoundException("Quiz not found with ID: " + id));
 
-	        for (Response response : responses) {
-	            for (Question question : questions) {
-	                if (question.getQuestionID() == response.getId()) {
-	                    if (question.getCorrectAnswer().equalsIgnoreCase(response.getResponse())) {
-	                    	rightAnswerScore++;
-	                    }
-	                    break; // no need to keep checking once matched
-	                }
-	            }
-	        }
+	    		    List<Question> questions = quiz.getQuestions();
+	    		    int rightAnswerScore = 0;
 
-	        return rightAnswerScore;
+	    		    for (Response response : responses) {
+	    		        for (Question question : questions) {
+	    		            if (question.getQuestionID() == response.getId()) {
+	    		                if (question.getCorrectAnswer().equalsIgnoreCase(response.getResponse())) {
+	    		                    rightAnswerScore++;
+	    		                }
+	    		                break;
+	    		            }
+	    		        }
+	    		    }
+
+	    		    return rightAnswerScore;
 	    }
 	
 	
