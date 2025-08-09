@@ -59,24 +59,7 @@ public class QuizService {
 
 		
 	    public Integer calculateResult(int id, List<Response> responses) {
-	    	 Quiz quiz = quizRepository.findById(id)
-	    		        .orElseThrow(() -> new ResourceNotFoundException("Quiz not found with ID: " + id));
-
-	    		    List<Question> questions = quiz.getQuestions();
-	    		    int rightAnswerScore = 0;
-
-	    		    for (Response response : responses) {
-	    		        for (Question question : questions) {
-	    		            if (question.getQuestionID() == response.getId()) {
-	    		                if (question.getCorrectAnswer().equalsIgnoreCase(response.getResponse())) {
-	    		                    rightAnswerScore++;
-	    		                }
-	    		                break;
-	    		            }
-	    		        }
-	    		    }
-
-	    		    return rightAnswerScore;
+y
 	    }
 	
 	
